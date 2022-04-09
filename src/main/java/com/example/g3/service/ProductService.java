@@ -20,8 +20,10 @@ public class ProductService {
     @Autowired
     private ProductRepo productRepo;
 
+    private ProductResponse productResponse;
+
     public ProductResponse findProducts(){
-        ProductResponse productResponse = new ProductResponse(new ArrayList<>(productRepo.findAll()));
+        productResponse = new ProductResponse(new ArrayList<>(productRepo.findAll()));
         return productResponse;
     }
 
@@ -36,7 +38,7 @@ public class ProductService {
         productRepo.save(p);
         List<Product> list = new ArrayList<>();
         list.add(p);
-        ProductResponse productResponse = new ProductResponse(list);
+        productResponse = new ProductResponse(list);
         return productResponse;
     }
 
@@ -46,8 +48,8 @@ public class ProductService {
         }
         List<Product> list = new ArrayList<>();
         list.add(productRepo.findById(id).get());
-        ProductResponse productResponseById = new ProductResponse(list);
-        return productResponseById;
+        productResponse= new ProductResponse(list);
+        return productResponse;
     }
 
     public static String getRandomNumberString() {
