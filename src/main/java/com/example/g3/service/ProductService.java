@@ -1,12 +1,15 @@
 package com.example.g3.service;
 
+import com.example.g3.exception.DuplicateProductException;
 import com.example.g3.exception.ProductNotFoundException;
 import com.example.g3.model.Product;
 import com.example.g3.model.ProductInfo;
+import com.example.g3.model.ProductResponse;
 import com.example.g3.repository.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -17,22 +20,34 @@ public class ProductService {
     @Autowired
     private ProductRepo productRepo;
 
-    public List<Product> findProducts(){
-        return productRepo.findAll().stream().collect(Collectors.toList());
+    public ProductResponse findProducts(){
+        ProductResponse productResponse = new ProductResponse(new ArrayList<>(productRepo.findAll()));
+        return productResponse;
     }
 
-    public Product addProduct(ProductInfo product) {
-
+    public ProductResponse addProduct(ProductInfo product) {
+        for (Product p: productRepo.findAll().stream().collect(Collectors.toList())){
+            if (p.getAttributes().getName().equals(product.getName()) || p.getAttributes().getPrice().equals(product.getPrice()))
+                throw new DuplicateProductException("Given product already exist");
+        }
         Product p = new Product(product);
         p.setType(Product.TypeEnum.PRODUCT);
         p.setId(getRandomNumberString());
         productRepo.save(p);
-        return p;
+        List<Product> list = new ArrayList<>();
+        list.add(p);
+        ProductResponse productResponse = new ProductResponse(list);
+        return productResponse;
     }
 
-    public Product findProductById(String id) {
-        if (productRepo.findById(id).isEmpty()) throw new ProductNotFoundException("Product with given ID does not exist!");
-        return productRepo.findById(id).get();
+    public ProductResponse findProductById(String id) {
+        if (productRepo.findById(id).isEmpty()){
+            throw new ProductNotFoundException("Product with given ID does not exist!");
+        }
+        List<Product> list = new ArrayList<>();
+        list.add(productRepo.findById(id).get());
+        ProductResponse productResponseById = new ProductResponse(list);
+        return productResponseById;
     }
 
     public static String getRandomNumberString() {

@@ -4,10 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
+@Embeddable
 @Entity
 @Data
 @AllArgsConstructor
@@ -22,6 +21,7 @@ public class Product {
 
     private TypeEnum type;
 
+    @Column(name = "PRODUCT_ID")
     @Id
     private String id;
 

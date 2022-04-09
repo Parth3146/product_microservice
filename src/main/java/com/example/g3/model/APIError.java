@@ -3,11 +3,14 @@ package com.example.g3.model;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 
+import javax.persistence.Embedded;
+
 @Data
 public class APIError {
 
     private HttpStatus status;
     private String code;
     private String title;
-    private String source;
+    @Embedded
+    private ErrorSource source;
 }
