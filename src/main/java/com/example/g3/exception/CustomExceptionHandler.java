@@ -1,6 +1,7 @@
 package com.example.g3.exception;
 
 import com.example.g3.model.APIError;
+import com.example.g3.model.ErrorResponse;
 import com.example.g3.model.ErrorSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,9 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @ControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -24,8 +28,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         apiError.setTitle(e.getMessage());
         ErrorSource es = new ErrorSource();
         es.setParameter("id");
+        es.setPointer("N/A");
         apiError.setSource(es);
-        return new ResponseEntity(apiError, new HttpHeaders(), apiError.getStatus());
+        List<APIError> list = new ArrayList<>();
+        list.add(apiError);
+        return new ResponseEntity(new ErrorResponse(list), new HttpHeaders(), apiError.getStatus());
     }
 
     @ExceptionHandler({DuplicateProductException.class})
@@ -36,8 +43,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         apiError.setTitle(e.getMessage());
         ErrorSource es = new ErrorSource();
         es.setParameter("Name / Price");
+        es.setPointer("N/A");
         apiError.setSource(es);
-        return new ResponseEntity(apiError, new HttpHeaders(), apiError.getStatus());
+        List<APIError> list = new ArrayList<>();
+        list.add(apiError);
+        return new ResponseEntity(new ErrorResponse(list), new HttpHeaders(), apiError.getStatus());
     }
 
     @Override
@@ -46,11 +56,14 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         APIError apiError = new APIError();
         apiError.setStatus(HttpStatus.BAD_REQUEST);
         ErrorSource es = new ErrorSource();
-        es.setPointer(ex.getParameter().toString());
+        es.setPointer(ex.getFieldError().getField());
+        es.setParameter("N/A");
         apiError.setSource(es);
         apiError.setTitle(fieldError.getDefaultMessage());
         apiError.setCode("400");
-
-        return new ResponseEntity(apiError, headers, apiError.getStatus());
+        List<APIError> list = new ArrayList<>();
+        list.add(apiError);
+        return new ResponseEntity(new ErrorResponse(list), headers, apiError.getStatus());
     }
 }
+
