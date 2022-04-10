@@ -2,7 +2,6 @@ package com.example.g3.model;
 
 
 import lombok.Data;
-import org.springframework.core.MethodParameter;
 
 import javax.persistence.Embeddable;
 
